@@ -18,7 +18,8 @@ Task("Build API").IsDependentOn("Restore NuGet packages").Does(() => {
 Task("Publish API").IsDependentOn("Build API").Does(()=>{
     var publishSettings = new DotNetPublishSettings(){
         NoBuild = true,
-        NoRestore = true
+        NoRestore = true,
+        OutputDirectory = "/out"
     };
     DotNetPublish("WeatherApi.csproj",publishSettings);
 });

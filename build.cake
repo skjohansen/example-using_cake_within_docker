@@ -1,12 +1,15 @@
 #addin nuget:?package=Cake.Docker&version=1.1.2
 var target = Argument("target", "Docker information");
+var dockerfile = Argument("dockerfile", "dockerfile");
 string [] dockerTags = new string[]  {  $"api_local"};
 string containerPort = "4567";
 
 Task("Build Docker Image")
 .Does(() => {
+    Information(dockerfile);
     var settings = new DockerImageBuildSettings { 
-        Tag=dockerTags
+        Tag=dockerTags,
+        File= dockerfile
     };
     DockerBuild(settings, ".");
 });

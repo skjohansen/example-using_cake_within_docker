@@ -1,23 +1,18 @@
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM cakebuild/cake:sdk-7.0 AS build
 WORKDIR /src
 
-
+COPY "WeatherApi/build.cake" .
 COPY "WeatherApi/WeatherApi.csproj" .
 
-RUN dotnet restore "WeatherApi.csproj"
+RUN dotnet cake --target="Restore NuGet packages"
 COPY WeatherApi/ .
-RUN dotnet build "WeatherApi.csproj" --no-restore
+RUN dotnet cake --target="Build API" --exclusive
 
 FROM build AS publish
-RUN dotnet publish "WeatherApi.csproj" --no-restore --no-build -o /out
+RUN dotnet cake --target="Publish API" --exclusive
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine
 WORKDIR /final
 COPY --from=publish /out .
-
-ARG USERNAME=empty
-ARG APIKEY=empty
-RUN echo "Used username: ${USERNAME}"
-RUN echo "Used apikey: ${APIKEY}"
 
 ENTRYPOINT ["dotnet", "WeatherApi.dll"]
